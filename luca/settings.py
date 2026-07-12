@@ -106,13 +106,18 @@ if database_url:
             conn_health_checks=True,
         )
     }
-else:
+elif DEBUG:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+else:
+    raise RuntimeError(
+        "DATABASE_URL is not configured. "
+        "Add the PostgreSQL DATABASE_URL variable in Railway."
+    )
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
