@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-
+from cloudinary.models import CloudinaryField
 from events.models import Event, PassType
 
 
@@ -52,11 +52,13 @@ class GuestEntry(models.Model):
         blank=True,
     )
 
-    payment_screenshot = models.ImageField(
-        upload_to="payment_screenshots/",
-        null=True,
+    payment_screenshot = CloudinaryField(
+        "payment_screenshot",
+        resource_type="image",
+        folder="luca/guestlist_payments",
         blank=True,
-    )
+        null=True,
+    )   
 
     member_remarks = models.TextField(blank=True)
     admin_remarks = models.TextField(blank=True)

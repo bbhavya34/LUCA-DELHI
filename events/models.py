@@ -12,11 +12,10 @@ class Event(models.Model):
 
     name = models.CharField(max_length=150)
 
-    # Event poster will now be uploaded to Cloudinary.
     poster = CloudinaryField(
         "poster",
         resource_type="image",
-        asset_folder="luca/event_posters",
+        folder="luca/event_posters",
         blank=True,
         null=True,
     )
@@ -121,20 +120,18 @@ class EventPhoto(models.Model):
         blank=True,
     )
 
-    # Gallery image stored permanently on Cloudinary.
     image = CloudinaryField(
         "image",
         resource_type="image",
-        asset_folder="luca/event_gallery",
+        folder="luca/event_gallery",
         blank=True,
         null=True,
     )
 
-    # Gallery video stored permanently on Cloudinary.
     video = CloudinaryField(
         "video",
         resource_type="video",
-        asset_folder="luca/event_gallery/videos",
+        folder="luca/event_gallery/videos",
         blank=True,
         null=True,
     )

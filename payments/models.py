@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 from events.models import Event
 
@@ -13,14 +14,16 @@ class PaymentQRCode(models.Model):
 
     title = models.CharField(max_length=150)
 
-    qr_image = models.ImageField(
-        upload_to="payment_qr/",
+    qr_image = CloudinaryField(
+        "qr_image",
+        resource_type="image",
+        folder="luca/payment_qr_codes",
+        blank=True,
+        null=True,
     )
 
     receiver_name = models.CharField(max_length=150)
-
     upi_id = models.CharField(max_length=150)
-
     instructions = models.TextField(blank=True)
 
     active_from = models.DateTimeField(
@@ -81,10 +84,12 @@ class PromoterPayment(models.Model):
         blank=True,
     )
 
-    payment_screenshot = models.ImageField(
-        upload_to="promoter_payments/",
-        null=True,
+    payment_screenshot = CloudinaryField(
+        "payment_screenshot",
+        resource_type="image",
+        folder="luca/payment_screenshots",
         blank=True,
+        null=True,
     )
 
     status = models.CharField(
@@ -109,7 +114,10 @@ class PromoterPayment(models.Model):
     )
 
     submitted_at = models.DateTimeField(auto_now_add=True)
-    verified_at = models.DateTimeField(null=True, blank=True)
+    verified_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return f"{self.promoter} - ₹{self.amount}"

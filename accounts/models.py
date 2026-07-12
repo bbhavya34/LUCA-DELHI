@@ -1,6 +1,7 @@
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 
 class User(AbstractUser):
@@ -26,11 +27,13 @@ class User(AbstractUser):
         blank=True,
     )
 
-    profile_image = models.ImageField(
-        upload_to="profiles/",
-        null=True,
-        blank=True,
-    )
+    profile_image = CloudinaryField(
+    "profile_image",
+    resource_type="image",
+    folder="luca/profile_images",
+    blank=True,
+    null=True,
+)
 
     is_account_active = models.BooleanField(default=True)
 
