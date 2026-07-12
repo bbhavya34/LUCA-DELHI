@@ -26,19 +26,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-local-development-only-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in {"1", "true", "yes", "on"}
+DEBUG = os.getenv("DJANGO_DEBUG", "false").lower() in {"1", "true", "yes", "on"}
 
 def env_list(name, default=""):
     return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
 
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.railway.app")
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.ngrok-free.app",
-    "https://*.ngrok-free.dev",
-    "https://*.ngrok.io",
-    "https://luca-delhi-production.up.railway.app",
-    "https://*.railway.app",
-]
+CSRF_TRUSTED_ORIGINS = env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    (
+        "https://*.ngrok-free.app,"
+        "https://*.ngrok-free.dev,"
+        "https://*.ngrok.io,"
+        "https://luca-delhi-production.up.railway.app,"
+        "https://*.railway.app"
+    ),
+)
 
 # Application definition
 
