@@ -31,9 +31,14 @@ DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in {"1", "true", "yes", "on"}
 def env_list(name, default=""):
     return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.ngrok-free.app,.ngrok-free.dev,.ngrok.io")
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "https://*.ngrok-free.app,https://*.ngrok-free.dev,https://*.ngrok.io")
-
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost,.railway.app")
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.ngrok-free.app",
+    "https://*.ngrok-free.dev",
+    "https://*.ngrok.io",
+    "https://luca-delhi-production.up.railway.app",
+    "https://*.railway.app",
+]
 
 # Application definition
 
@@ -114,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -144,20 +149,28 @@ STORAGES = {
 
 # Production security. Set DJANGO_DEBUG=false behind an HTTPS reverse proxy.
 if not DEBUG:
-    SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "true").lower() == "true"
+    SECURE_SSL_REDIRECT = os.getenv(
+        "DJANGO_SECURE_SSL_REDIRECT", "true"
+    ).lower() == "true"
+
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", "true").lower() == "true"
-    SECURE_HSTS_PRELOAD = os.getenv("DJANGO_SECURE_HSTS_PRELOAD", "false").lower() == "true"
+
+    SECURE_HSTS_SECONDS = int(
+        os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000")
+    )
+
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.getenv(
+        "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", "true"
+    ).lower() == "true"
+
+    SECURE_HSTS_PRELOAD = os.getenv(
+        "DJANGO_SECURE_HSTS_PRELOAD", "false"
+    ).lower() == "true"
+
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     USE_X_FORWARDED_HOST = True
+
     X_FRAME_OPTIONS = "DENY"
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    REFERRER_POLICY = "same-origin"
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-LOGIN_URL = "accounts:login"
-LOGIN_REDIRECT_URL = "dashboard:redirect"
-LOGOUT_REDIRECT_URL = "accounts:login"
+    SECURE_REFERRER_POLICY = "same-origin"
