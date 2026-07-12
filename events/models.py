@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from cloudinary.models import CloudinaryField
 
 
 class Event(models.Model):
@@ -11,10 +12,13 @@ class Event(models.Model):
 
     name = models.CharField(max_length=150)
 
-    poster = models.ImageField(
-        upload_to="event_posters/",
-        null=True,
+    # Event poster will now be uploaded to Cloudinary.
+    poster = CloudinaryField(
+        "poster",
+        resource_type="image",
+        asset_folder="luca/event_posters",
         blank=True,
+        null=True,
     )
 
     description = models.TextField(blank=True)
@@ -94,7 +98,6 @@ class PassType(models.Model):
     )
 
     is_active = models.BooleanField(default=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -105,12 +108,49 @@ class PassType(models.Model):
 
 
 class EventPhoto(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name="gallery_photos", null=True, blank=True)
-    custom_event_name = models.CharField(max_length=150, blank=True)
-    image = models.ImageField(upload_to="event_gallery/%Y/%m/", null=True, blank=True)
-    video = models.FileField(upload_to="event_gallery/videos/%Y/%m/", null=True, blank=True)
-    caption = models.CharField(max_length=180, blank=True)
-    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="uploaded_event_photos")
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name="gallery_photos",
+        null=True,
+        blank=True,
+    )
+
+    custom_event_name = models.CharField(
+        max_length=150,
+        blank=True,
+    )
+
+    # Gallery image stored permanently on Cloudinary.
+    image = CloudinaryField(
+        "image",
+        resource_type="image",
+        asset_folder="luca/event_gallery",
+        blank=True,
+        null=True,
+    )
+
+    # Gallery video stored permanently on Cloudinary.
+    video = CloudinaryField(
+        "video",
+        resource_type="video",
+        asset_folder="luca/event_gallery/videos",
+        blank=True,
+        null=True,
+    )
+
+    caption = models.CharField(
+        max_length=180,
+        blank=True,
+    )
+
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="uploaded_event_photos",
+    )
+
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
