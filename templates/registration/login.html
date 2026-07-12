@@ -1,0 +1,16 @@
+{% extends 'base/public_base.html' %}{% load static %}
+{% block title %}Sign in · LUCA{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/login.css' %}">{% endblock %}
+{% block content %}
+<main class="login-page" id="main">
+  <section class="night-hero" aria-labelledby="hero-title">
+    <div class="hero-glow hero-glow-purple"></div><div class="hero-glow hero-glow-cyan"></div>
+    <header class="hero-header"><div class="login-logo"><img src="{% static 'images/Luca.png' %}" alt="LUCA"></div></header>
+    <div class="hero-copy"><h1 id="hero-title"><span>CONTROL</span><span>THE NIGHT</span></h1><p class="hero-description">One premium operations universe for the people who turn a room into a moment.</p></div>
+    <div class="orb orb-main" aria-hidden="true"></div>
+    <div class="status-panel"><small>LIVE FLOOR STATUS</small><strong>READY</strong><span>LUCA nights · doors open</span></div>
+    <div class="shape-bars" aria-hidden="true"><i></i><i></i><i></i></div><div class="orb orb-small" aria-hidden="true"></div><div class="prism" aria-hidden="true"><i></i><i></i><i></i></div>
+  </section>
+  <section class="login-panel"><div class="login-card"><p class="eyebrow">ADMIN OS · MEMBER OS</p><h2>Welcome to LUCA</h2><p class="tagline">Bringing light to your nights⭐️</p><form method="post" data-loading-form>{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}{% include 'components/form_field.html' with field=form.identifier %}<div class="field password-wrap"><label>Password</label>{{ form.password }}<button type="button" data-password-toggle>Show</button>{{ form.password.errors }}</div><label class="check">{{ form.remember_me }} Remember me</label><button class="btn btn-primary btn-block" type="submit">Enter LUCA</button></form></div></section>
+</main>
+{% endblock %}

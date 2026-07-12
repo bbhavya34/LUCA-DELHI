@@ -1,0 +1,1 @@
+document.querySelector('[data-add-guest]')?.addEventListener('click',()=>{const total=document.querySelector('[name$="TOTAL_FORMS"]'),box=document.querySelector('[data-guestset]'),tpl=document.querySelector('#empty-guest').innerHTML.replaceAll('__prefix__',total.value);box.insertAdjacentHTML('beforeend',tpl);total.value=Number(total.value)+1});

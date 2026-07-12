@@ -1,0 +1,1 @@
+document.querySelector('[data-add-form]')?.addEventListener('click',()=>{const total=document.querySelector('[name$="TOTAL_FORMS"]'),box=document.querySelector('[data-formset]'),tpl=document.querySelector('#empty-form').innerHTML.replaceAll('__prefix__',total.value);box.insertAdjacentHTML('beforeend',tpl);total.value=Number(total.value)+1});

@@ -1,0 +1,1 @@
+document.querySelectorAll('.message button').forEach(b=>b.addEventListener('click',()=>b.parentElement.remove()));document.querySelectorAll('[data-confirm]').forEach(x=>x.addEventListener('click',e=>{if(!confirm(x.dataset.confirm||'Are you sure?'))e.preventDefault()}));

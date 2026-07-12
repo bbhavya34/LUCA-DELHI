@@ -1,0 +1,4 @@
+from django.urls import path
+from . import views
+app_name="events"
+urlpatterns=[path("",views.event_list,name="list"),path("create/",views.create,name="create"),path("gallery/",views.gallery,name="gallery"),path("gallery/member/",views.member_gallery,name="member_gallery"),path("gallery/upload/",views.gallery_upload,name="gallery_upload"),path("gallery/event/<int:pk>/rename/",views.gallery_event_rename,name="gallery_event_rename"),path("gallery/event/<int:pk>/delete/",views.gallery_event_delete,name="gallery_event_delete"),path("gallery/<int:pk>/delete/",views.gallery_delete,name="gallery_delete"),path("<int:pk>/",views.detail,name="detail"),path("<int:pk>/edit/",views.update,name="update"),path("<int:pk>/delete/",views.delete,name="delete"),path("<int:pk>/publish/",views.publish,name="publish"),path("<int:pk>/close/",views.close,name="close")]

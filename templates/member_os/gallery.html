@@ -1,0 +1,2 @@
+{% extends 'base/member_base.html' %}{% block page_title %}Past Event Gallery{% endblock %}
+{% block member_content %}<div class="gallery-toolbar"><form method="get"><select name="event" onchange="this.form.submit()"><option value="">All past events</option>{% for event in events %}<option value="{{ event.pk }}" {% if request.GET.event == event.pk|stringformat:'s' %}selected{% endif %}>{{ event.name }}</option>{% endfor %}</select></form></div>{% include 'components/gallery_grid.html' %}{% endblock %}

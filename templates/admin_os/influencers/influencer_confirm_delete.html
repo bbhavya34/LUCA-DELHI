@@ -1,0 +1,1 @@
+{% extends 'base/admin_base.html' %}{% block page_title %}Delete influencer{% endblock %}{% block admin_content %}<div class="card"><h2>Delete {{ influencer }}?</h2><form method="post">{% csrf_token %}<button class="btn btn-danger">Confirm delete</button></form></div>{% endblock %}

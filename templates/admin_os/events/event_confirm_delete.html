@@ -1,0 +1,1 @@
+{% extends 'base/admin_base.html' %}{% block page_title %}Confirm deletion{% endblock %}{% block admin_content %}<div class="card"><h2>Delete {{ event }}?</h2><p>This action cannot be undone.</p><form method="post">{% csrf_token %}<button class="btn btn-danger">Confirm delete</button></form></div>{% endblock %}
