@@ -4,7 +4,7 @@ Django settings for the Luca project.
 
 import os
 from pathlib import Path
-
+import cloudinary
 import dj_database_url
 
 
@@ -100,7 +100,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+     "cloudinary",
     # Luca applications
     "accounts.apps.AccountsConfig",
     "dashboard.apps.DashboardConfig",
@@ -189,6 +189,12 @@ else:
         "Add the PostgreSQL DATABASE_URL environment variable."
     )
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
+    secure=True,
+)
 
 # ---------------------------------------------------------------------------
 # Custom user model
@@ -283,7 +289,6 @@ STORAGES = {
         ),
     },
 }
-
 
 # ---------------------------------------------------------------------------
 # Default primary key
