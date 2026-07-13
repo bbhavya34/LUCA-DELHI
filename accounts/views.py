@@ -25,6 +25,11 @@ def login_view(request):
 def logout_view(request): logout(request); return redirect("accounts:login")
 
 @admin_required
+def member_list(request):
+    members=User.objects.filter(role=User.Role.MEMBER).order_by("first_name","last_name","pk")
+    return render(request,"admin_os/promoters/member_list.html",{"page_obj":Paginator(members,20).get_page(request.GET.get("page"))})
+
+@admin_required
 def member_create(request):
     form=MemberCreationForm(request.POST or None, request.FILES or None)
     if request.method=="POST" and form.is_valid():
@@ -36,6 +41,21 @@ def member_edit(request,pk):
     user=get_object_or_404(User,pk=pk,role=User.Role.MEMBER); form=MemberUpdateForm(request.POST or None,request.FILES or None,instance=user)
     if request.method=="POST" and form.is_valid(): form.save(); messages.success(request,"Member updated."); return redirect("promoters:detail",pk=user.promoter_profile.pk)
     return render(request,"admin_os/promoters/member_edit.html",{"form":form,"member":user})
+
+@admin_required
+def member_remove(request,pk):
+    user=get_object_or_404(User,pk=pk,role=User.Role.MEMBER)
+    if request.method=="POST":
+        user.is_account_active=False
+        user.is_active=False
+        user.save(update_fields=("is_account_active","is_active"))
+        profile=getattr(user,"promoter_profile",None)
+        if profile:
+            profile.assigned_events.clear()
+        log_activity(request.user,"Member removed",user)
+        messages.success(request,f"Member {user.luca_id or user.username} removed.")
+        return redirect("accounts:member_list")
+    return render(request,"admin_os/promoters/member_confirm_remove.html",{"member":user})
 
 @admin_required
 def admin_list(request):

@@ -6,13 +6,12 @@ from .models import Event, EventPhoto, PassType
 
 class EventForm(forms.ModelForm):
     class Meta:
-        model=Event; fields=("name","poster","description","venue","event_date","start_time","end_time","guestlist_closing_time","status")
-        widgets={"event_date":forms.DateInput(attrs={"type":"date"}),"start_time":forms.TimeInput(attrs={"type":"time"}),"end_time":forms.TimeInput(attrs={"type":"time"}),"guestlist_closing_time":forms.DateTimeInput(attrs={"type":"datetime-local"})}
+        model=Event; fields=("name","poster","description","venue","event_date","start_time","guestlist_closing_time","status")
+        widgets={"event_date":forms.DateInput(attrs={"type":"date"}),"start_time":forms.TimeInput(attrs={"type":"time"}),"guestlist_closing_time":forms.DateTimeInput(attrs={"type":"datetime-local"})}
     def __init__(self,*a,**kw): super().__init__(*a,**kw); [f.widget.attrs.setdefault("class","form-control") for f in self.fields.values()]
     def clean_poster(self): return validate_image(self.cleaned_data.get("poster"),8)
     def clean(self):
-        d=super().clean(); start,end,date,close=d.get("start_time"),d.get("end_time"),d.get("event_date"),d.get("guestlist_closing_time")
-        if start and end and end<=start: self.add_error("end_time","End time must be after start time.")
+        d=super().clean(); start,date,close=d.get("start_time"),d.get("event_date"),d.get("guestlist_closing_time")
         if date and start and close:
             event_dt=timezone.make_aware(__import__('datetime').datetime.combine(date,start))
             if close>event_dt: self.add_error("guestlist_closing_time","Closing time must not be after the event starts.")
@@ -49,7 +48,7 @@ class EventPhotoForm(forms.Form):
     caption=forms.CharField(max_length=180,required=False)
     def __init__(self,*a,**kw):
         super().__init__(*a,**kw)
-        self.fields["event"].queryset=Event.objects.filter(status=Event.Status.COMPLETED)
+        self.fields["event"].queryset=Event.objects.all()
         [f.widget.attrs.setdefault("class","form-control") for f in self.fields.values()]
     def clean(self):
         data=super().clean(); event,custom=data.get("event"),data.get("custom_event_name")

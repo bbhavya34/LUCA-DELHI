@@ -10,6 +10,8 @@ class PaymentQRCode(models.Model):
         Event,
         on_delete=models.CASCADE,
         related_name="payment_qr_codes",
+        null=True,
+        blank=True,
     )
 
     title = models.CharField(max_length=150)
@@ -48,7 +50,7 @@ class PaymentQRCode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.event.name} - {self.upi_id}"
+        return f"Shared QR - {self.upi_id}"
 
 
 class PromoterPayment(models.Model):

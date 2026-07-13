@@ -13,6 +13,7 @@ import dj_database_url
 # ---------------------------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+IS_RENDER = os.getenv("RENDER", "false").lower() == "true"
 
 
 # ---------------------------------------------------------------------------
@@ -41,7 +42,7 @@ SECRET_KEY = os.getenv(
 
 DEBUG = os.getenv(
     "DJANGO_DEBUG",
-    "false",
+    "false" if IS_RENDER else "true",
 ).strip().lower() in {"1", "true", "yes", "on"}
 
 
@@ -100,7 +101,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-     "cloudinary",
+    "cloudinary",
     # Luca applications
     "accounts.apps.AccountsConfig",
     "dashboard.apps.DashboardConfig",
@@ -189,12 +190,25 @@ else:
         "Add the PostgreSQL DATABASE_URL environment variable."
     )
 
-cloudinary.config(
-    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.getenv("CLOUDINARY_API_KEY"),
-    api_secret=os.getenv("CLOUDINARY_API_SECRET"),
-    secure=True,
-)
+CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
+
+if CLOUDINARY_URL:
+    # The Cloudinary SDK reads CLOUDINARY_URL automatically.
+    cloudinary.config(secure=True)
+elif all((CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET)):
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
+else:
+    # Allows existing Cloudinary public IDs to render during local tests.
+    # Uploads still require real credentials in the deployed environment.
+    cloudinary.config(cloud_name="demo", secure=True)
 
 # ---------------------------------------------------------------------------
 # Custom user model
@@ -271,7 +285,8 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = "/media/"
 
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = Path(os.getenv("DJANGO_MEDIA_ROOT", BASE_DIR / "media"))
+SERVE_MEDIA_FILES = os.getenv("DJANGO_SERVE_MEDIA", "false").lower() in {"1", "true", "yes", "on"}
 
 
 # ---------------------------------------------------------------------------

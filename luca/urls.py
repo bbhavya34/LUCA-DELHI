@@ -17,9 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve as serve_media
 from django.db import connection
 from django.http import JsonResponse
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 def health_check(request):
     try:
@@ -42,3 +43,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.SERVE_MEDIA_FILES:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve_media, {"document_root": settings.MEDIA_ROOT}),
+    ]

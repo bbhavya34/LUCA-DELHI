@@ -19,15 +19,17 @@ def _filtered(request,qs):
     return qs
 @member_required
 def member_create(request):
-    has_events=Event.objects.filter(status=Event.Status.ACTIVE,assigned_promoters__user=request.user).exists()
-    if not has_events: return render(request,"member_os/guestlists/guestlist_create.html",{"has_events":False})
     FormSet=GuestEntryFormSet; fs=FormSet(request.POST or None,request.FILES or None,form_kwargs={"user":request.user},prefix="guests")
     if request.method=="POST" and fs.is_valid():
         with transaction.atomic():
+            created=False
             for form in fs:
-                if form.cleaned_data and not form.cleaned_data.get("DELETE"): entry=form.save(commit=False); entry.promoter=request.user; entry.save()
+                if form.cleaned_data and not form.cleaned_data.get("DELETE"):
+                    entry=form.save(commit=False); entry.promoter=request.user; entry.save(); created=True
+            if not created:
+                GuestEntry.objects.create(promoter=request.user)
         messages.success(request,"Guest entries submitted."); return redirect("guestlists:member_list")
-    return render(request,"member_os/guestlists/guestlist_create.html",{"formset":fs,"has_events":True})
+    return render(request,"member_os/guestlists/guestlist_create.html",{"formset":fs})
 @member_required
 def member_list(request): return render(request,"member_os/guestlists/guestlist_list.html",{"page_obj":Paginator(_filtered(request,GuestEntry.objects.filter(promoter=request.user).select_related("event","pass_type")),20).get_page(request.GET.get("page"))})
 @member_required
@@ -39,8 +41,12 @@ def admin_create(request):
     fs=AdminGuestEntryFormSet(request.POST or None,request.FILES or None,prefix="guests")
     if request.method=="POST" and fs.is_valid():
         with transaction.atomic():
+            created=False
             for form in fs:
-                if form.cleaned_data and not form.cleaned_data.get("DELETE"): form.save()
+                if form.cleaned_data and not form.cleaned_data.get("DELETE"):
+                    form.save(); created=True
+            if not created:
+                GuestEntry.objects.create()
         messages.success(request,"Guest entries created."); return redirect("guestlists:admin_list")
     return render(request,"admin_os/guestlists/guestlist_create.html",{"formset":fs})
 @admin_required
@@ -58,5 +64,8 @@ def reject(request,pk): return _decision(request,pk,GuestEntry.VerificationStatu
 @admin_required
 def export_csv(request):
     response=HttpResponse(content_type="text/csv",headers={"Content-Disposition":'attachment; filename="guestlists.csv"'}); w=csv.writer(response); w.writerow(["Guest Name","Contact Number","Email","Event","Pass Type","Promoter Name","LUCA ID","UPI ID","Amount Paid","Status","Submitted At"])
-    for x in _filtered(request,GuestEntry.objects.select_related("event","pass_type","promoter")): w.writerow([x.guest_name,x.contact_number,x.email,x.event,x.pass_type,x.promoter.get_full_name(),x.promoter.luca_id,x.payment_upi_id,x.amount_paid,x.verification_status,x.submitted_at])
+    for x in _filtered(request,GuestEntry.objects.select_related("event","pass_type","promoter")):
+        promoter_name=x.promoter.get_full_name() if x.promoter else ""
+        promoter_id=x.promoter.luca_id if x.promoter else ""
+        w.writerow([x.guest_name,x.contact_number,x.email,x.event or "",x.pass_type or "",promoter_name,promoter_id,x.payment_upi_id,x.amount_paid if x.amount_paid is not None else "",x.verification_status,x.submitted_at])
     return response

@@ -10,4 +10,9 @@ def calculate_promoter_commission(promoter,event=None,status=GuestEntry.Verifica
     if not profile: return Decimal("0")
     if profile.commission_type==PromoterProfile.CommissionType.FIXED: return profile.commission_value*qs.count()
     if profile.commission_type==PromoterProfile.CommissionType.PERCENTAGE: return (qs.aggregate(v=Sum("amount_paid"))["v"] or Decimal("0"))*profile.commission_value/100
-    return sum((entry.pass_type.promoter_commission for entry in qs.select_related("pass_type")),Decimal("0"))
+    return sum((entry.pass_type.promoter_commission for entry in qs.select_related("pass_type") if entry.pass_type),Decimal("0"))
+
+def calculate_outstanding_commission(promoter):
+    earned=calculate_promoter_commission(promoter)
+    settled=promoter.commission_settlements.aggregate(v=Sum("amount"))["v"] or Decimal("0")
+    return max(earned-settled,Decimal("0"))

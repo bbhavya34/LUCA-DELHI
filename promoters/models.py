@@ -46,3 +46,25 @@ class PromoterProfile(models.Model):
 
     def __str__(self):
         return self.user.luca_id or self.user.username
+
+
+class CommissionSettlement(models.Model):
+    promoter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="commission_settlements",
+    )
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    settled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="processed_commission_settlements",
+    )
+    settled_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-settled_at"]
+
+    def __str__(self):
+        return f"{self.promoter} - ₹{self.amount}"

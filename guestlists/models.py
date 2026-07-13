@@ -14,23 +14,29 @@ class GuestEntry(models.Model):
         Event,
         on_delete=models.PROTECT,
         related_name="guest_entries",
+        null=True,
+        blank=True,
     )
 
     pass_type = models.ForeignKey(
         PassType,
         on_delete=models.PROTECT,
         related_name="guest_entries",
+        null=True,
+        blank=True,
     )
 
     promoter = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
         related_name="guestlist_entries",
+        null=True,
+        blank=True,
     )
 
-    guest_name = models.CharField(max_length=150)
+    guest_name = models.CharField(max_length=150, blank=True)
 
-    contact_number = models.CharField(max_length=15)
+    contact_number = models.CharField(max_length=15, blank=True)
 
     email = models.EmailField(
         blank=True,
@@ -45,6 +51,8 @@ class GuestEntry(models.Model):
     amount_paid = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        null=True,
+        blank=True,
     )
 
     payment_date = models.DateField(
@@ -89,4 +97,6 @@ class GuestEntry(models.Model):
         ordering = ["-submitted_at"]
 
     def __str__(self):
-        return f"{self.guest_name} - {self.event.name}"
+        guest = self.guest_name or "Unnamed guest"
+        event = self.event.name if self.event else "No event"
+        return f"{guest} - {event}"
